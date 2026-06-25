@@ -1,0 +1,67 @@
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow: hidden;
+
+  border: 1px solid var(--magritte-color-stroke-neutral-v24-7-0);
+  border-radius: 16px;
+
+  background: var(--magritte-color-background-primary-v24-7-0);
+}
+
+.weekday {
+  border-right: 1px solid var(--magritte-color-stroke-neutral-v24-7-0);
+  border-bottom: 1px solid var(--magritte-color-stroke-neutral-v24-7-0);
+}
+
+.weekday:nth-child(7n) {
+  border-right: none;
+}
+
+.dayCell {
+  overflow: hidden;
+
+  border-right: 1px solid var(--magritte-color-stroke-neutral-v24-7-0);
+  border-bottom: 1px solid var(--magritte-color-stroke-neutral-v24-7-0);
+
+  background: var(--magritte-color-background-primary-v24-7-0);
+}
+
+.dayCell:nth-child(7n) {
+  border-right: none;
+}
+
+.dayCellToday {
+  box-shadow: inset 0 0 0 2px var(--magritte-color-stroke-accent-v24-7-0);
+}
+
+.createButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transform: scale(0.92);
+
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.dayCell:hover .createButton,
+.dayCell:focus-within .createButton {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.weekDay {
+  border: 1px solid var(--magritte-color-stroke-neutral-v24-7-0);
+  border-radius: 16px;
+
+  background: var(--magritte-color-background-primary-v24-7-0);
+}
+
+.weekDayToday {
+  border-color: var(--magritte-color-stroke-accent-v24-7-0);
+  box-shadow: inset 0 0 0 1px var(--magritte-color-stroke-accent-v24-7-0);
+}
