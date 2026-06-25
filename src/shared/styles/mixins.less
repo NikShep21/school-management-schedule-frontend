@@ -1,0 +1,10 @@
+@import "@hh.ru/magritte-ui-breakpoint/breakpoints.less";
+@import "./variables.less";
+
+.page-padding() {
+  padding: @page-padding-mobile;
+
+  @media @screen-magritte-gt-s {
+    padding: @page-padding-desktop;
+  }
+}
