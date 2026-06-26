@@ -1,3 +1,5 @@
+import { getScheduleDateKey } from "@/modules/schedule/lib/formatScheduleDate";
+
 export type CalendarView = "month" | "week";
 
 interface CalendarRange {
@@ -40,21 +42,13 @@ const getWeekEnd = (date: Date): Date => {
   return weekEnd;
 };
 
-export const getDateKey = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
-
 export const getScheduleRange = (date: Date, view: CalendarView): CalendarRange => {
   const startDate = view === "month" ? getMonthStart(date) : getWeekStart(date);
   const endDate = view === "month" ? getMonthEnd(date) : getWeekEnd(date);
 
   return {
-    startDate: getDateKey(startDate),
-    endDate: getDateKey(endDate),
+    startDate: getScheduleDateKey(startDate),
+    endDate: getScheduleDateKey(endDate),
   };
 };
 
@@ -121,7 +115,7 @@ export const getPreviousPeriodDate = (date: Date, view: CalendarView): Date => {
 };
 
 const isSameDay = (firstDate: Date, secondDate: Date): boolean => {
-  return getDateKey(firstDate) === getDateKey(secondDate);
+  return getScheduleDateKey(firstDate) === getScheduleDateKey(secondDate);
 };
 
 export const isSameMonth = (firstDate: Date, secondDate: Date): boolean => {
