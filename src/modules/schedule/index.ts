@@ -1,1 +1,1 @@
-export { Schedule } from "./components/Schedule/Schedule";
+export { Schedule } from "./components/schedule/Schedule";

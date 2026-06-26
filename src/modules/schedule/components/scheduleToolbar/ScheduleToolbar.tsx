@@ -1,8 +1,10 @@
-import { Button, Flex } from "@hh.ru/magritte-ui";
+import { Button, Flex, Loader, Text } from "@hh.ru/magritte-ui";
 import {
   ChevronLeftOutlinedSize24,
   ChevronRightOutlinedSize24,
 } from "@hh.ru/magritte-ui/icon";
+
+import { scheduleTexts } from "@/modules/schedule/constants/scheduleTexts";
 
 import {
   getNextPeriodDate,
@@ -14,12 +16,14 @@ import { formatSchedulePeriodTitle } from "@/modules/schedule/lib/formatSchedule
 type ScheduleToolbarProps = {
   calendarDate: Date;
   view: CalendarView;
+  isFetching: boolean;
   onDateChange: (date: Date) => void;
 };
 
 export const ScheduleToolbar = ({
   calendarDate,
   view,
+  isFetching,
   onDateChange,
 }: ScheduleToolbarProps) => {
   const handlePreviousClick = () => {
@@ -36,7 +40,7 @@ export const ScheduleToolbar = ({
 
   return (
     <Flex align="center" justify="space-between" gap={16} mb={24}>
-      <Flex align="center" gap={8}>
+      <Flex align="center" gap={12}>
         <Button
           type="button"
           mode="secondary"
@@ -44,25 +48,25 @@ export const ScheduleToolbar = ({
           size="small"
           onClick={handleTodayClick}
         >
-          Сегодня
+          {scheduleTexts.toolbar.today}
         </Button>
 
         <ChevronLeftOutlinedSize24
-          aria-label="Предыдущий период"
+          aria-label={scheduleTexts.toolbar.previousPeriod}
           initialColor="primary"
           highlightedColor="accent"
           onClick={handlePreviousClick}
         />
 
         <ChevronRightOutlinedSize24
-          aria-label="Следующий период"
+          aria-label={scheduleTexts.toolbar.nextPeriod}
           initialColor="primary"
           highlightedColor="accent"
           onClick={handleNextClick}
         />
+        <Text>{formatSchedulePeriodTitle(calendarDate)}</Text>
+        {isFetching && <Loader size={24} />}
       </Flex>
-
-      <div>{formatSchedulePeriodTitle(calendarDate)}</div>
     </Flex>
   );
 };
