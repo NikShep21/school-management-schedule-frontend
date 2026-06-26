@@ -2,13 +2,23 @@ import { Flex, Text } from "@hh.ru/magritte-ui";
 
 import { MonthDayCell } from "@/modules/schedule/components/scheduleCalendar/MonthDayCell";
 import type { ScheduleCalendarProps } from "@/modules/schedule/components/scheduleCalendar/ScheduleCalendar";
-import { getDateKey } from "@/modules/schedule/lib/calendar";
 
 import styles from "./ScheduleCalendar.module.less";
+import { getScheduleDateKey } from "@/modules/schedule/lib/formatScheduleDate";
 
 const WEEKDAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] as const;
 
-export const MonthCalendar = ({ days, calendarDate }: ScheduleCalendarProps) => {
+type MonthCalendarProps = Omit<ScheduleCalendarProps, "view">;
+
+export const MonthCalendar = ({
+  days,
+  calendarDate,
+
+  eventsByDate,
+  onEventClick,
+
+  onMoreEventsClick,
+}: MonthCalendarProps) => {
   return (
     <div className={styles.calendar}>
       {WEEKDAYS.map((weekday) => (
@@ -26,9 +36,18 @@ export const MonthCalendar = ({ days, calendarDate }: ScheduleCalendarProps) => 
       ))}
 
       {days.map((day) => {
-        const dateKey = getDateKey(day);
+        const dateKey = getScheduleDateKey(day);
 
-        return <MonthDayCell key={dateKey} day={day} calendarDate={calendarDate} />;
+        return (
+          <MonthDayCell
+            key={dateKey}
+            day={day}
+            calendarDate={calendarDate}
+            events={eventsByDate[dateKey] ?? []}
+            onEventClick={onEventClick}
+            onMoreEventsClick={onMoreEventsClick}
+          />
+        );
       })}
     </div>
   );
