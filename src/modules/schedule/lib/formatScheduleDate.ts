@@ -36,3 +36,8 @@ export const formatScheduleEventTimeRange = (
 ): string => {
   return `${formatScheduleEventTime(startTime)}–${formatScheduleEventTime(endTime)}`;
 };
+export const formatWeekday = (date: Date): string => {
+  return new Intl.DateTimeFormat("ru-RU", {
+    weekday: "short",
+  }).format(date);
+};
