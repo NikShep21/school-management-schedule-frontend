@@ -5,18 +5,15 @@ import type { ScheduleCalendarProps } from "@/modules/schedule/components/schedu
 
 import styles from "./ScheduleCalendar.module.less";
 import { getScheduleDateKey } from "@/modules/schedule/lib/formatScheduleDate";
-
-const WEEKDAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] as const;
+import { WEEKDAYS } from "@/modules/schedule/constants/scheduleCalendar";
 
 type MonthCalendarProps = Omit<ScheduleCalendarProps, "view">;
 
 export const MonthCalendar = ({
   days,
   calendarDate,
-
   eventsByDate,
   onEventClick,
-
   onMoreEventsClick,
 }: MonthCalendarProps) => {
   return (

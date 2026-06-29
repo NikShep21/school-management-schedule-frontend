@@ -12,13 +12,13 @@ import {
   type CalendarView,
 } from "@/modules/schedule/lib/calendar";
 import { getEventsByDate } from "@/modules/schedule/lib/getEventsByDate";
-import type { ScheduleEvent } from "@/modules/schedule/model/types";
+import type { ScheduleEvent, TrackFilterValue } from "@/modules/schedule/model/types";
 
 export const Schedule = () => {
   const { isMobile } = useBreakpoint();
 
   const [calendarDate, setCalendarDate] = useState(() => new Date());
-
+  const [trackFilter, setTrackFilter] = useState<TrackFilterValue>("ALL");
   const [selectedEventsDate, setSelectedEventsDate] = useState<string | null>(null);
   const [isDayEventsModalVisible, setIsDayEventsModalVisible] = useState(false);
 
@@ -26,6 +26,7 @@ export const Schedule = () => {
 
   const scheduleParams = {
     ...getScheduleRange(calendarDate, view),
+    track: trackFilter === "ALL" ? undefined : trackFilter,
   };
 
   const {
@@ -39,10 +40,6 @@ export const Schedule = () => {
   const eventsByDate = useMemo(() => {
     return getEventsByDate(scheduleDays);
   }, [scheduleDays]);
-
-  const selectedDayEvents = selectedEventsDate
-    ? (eventsByDate[selectedEventsDate] ?? [])
-    : [];
 
   const handleMoreEventsClick = (date: string) => {
     setSelectedEventsDate(date);
@@ -66,8 +63,11 @@ export const Schedule = () => {
       <ScheduleToolbar
         calendarDate={calendarDate}
         view={view}
+        isMobile={isMobile}
         isFetching={isFetching && !isPending}
+        trackFilter={trackFilter}
         onDateChange={setCalendarDate}
+        onTrackFilterChange={setTrackFilter}
       />
 
       {isPending ? (
@@ -78,6 +78,7 @@ export const Schedule = () => {
         <ScheduleCalendar
           days={days}
           calendarDate={calendarDate}
+          view={view}
           eventsByDate={eventsByDate}
           onEventClick={handleEventClick}
           onMoreEventsClick={handleMoreEventsClick}
@@ -88,7 +89,7 @@ export const Schedule = () => {
         <DayEventsModal
           visible={isDayEventsModalVisible}
           date={selectedEventsDate}
-          events={selectedDayEvents}
+          events={eventsByDate[selectedEventsDate] ?? []}
           onClose={handleCloseDayEventsModal}
           onAfterExit={handleDayEventsModalAfterExit}
           onEventClick={handleEventClick}

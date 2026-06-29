@@ -1,48 +1,16 @@
 import { Card, Flex, Text } from "@hh.ru/magritte-ui";
 import type { ScheduleEvent } from "@/modules/schedule/model/types";
-import type { LectureTrack } from "@/entities/lecture";
-import { formatScheduleEventTime } from "@/modules/schedule/lib/formatScheduleDate";
+
+import { formatScheduleEventTimeRange } from "@/modules/schedule/lib/formatScheduleDate";
+import {
+  getTrackView,
+  TRACK_CONFIG,
+} from "@/modules/schedule/components/scheduleEventCard/constants";
 
 type ScheduleEventCardProps = {
   event: ScheduleEvent;
   compact?: boolean;
   onClick: (event: ScheduleEvent) => void;
-};
-
-type LectureTrackView = LectureTrack | "COMMON";
-
-const TRACK_CONFIG = {
-  FRONTEND: {
-    label: "Frontend",
-    cardStyle: "accent-secondary",
-    textStyle: "accent",
-  },
-  BACKEND: {
-    label: "Backend",
-    cardStyle: "positive-secondary",
-    textStyle: "positive",
-  },
-  ANALYTICS: {
-    label: "Analytics",
-    cardStyle: "special-secondary",
-    textStyle: "special",
-  },
-  COMMON: {
-    label: "Общая",
-    cardStyle: "vivid-secondary",
-    textStyle: "warning",
-  },
-} as const;
-
-const getTrackView = (tracks: LectureTrack[]): LectureTrackView => {
-  const hasFrontend = tracks.includes("FRONTEND");
-  const hasBackend = tracks.includes("BACKEND");
-
-  if (hasFrontend && hasBackend) return "COMMON";
-  if (hasFrontend) return "FRONTEND";
-  if (hasBackend) return "BACKEND";
-
-  return "ANALYTICS";
 };
 
 export const ScheduleEventCard = ({
@@ -52,8 +20,6 @@ export const ScheduleEventCard = ({
 }: ScheduleEventCardProps) => {
   const trackView = getTrackView(event.tracks);
   const trackConfig = TRACK_CONFIG[trackView];
-
-  const time = `${formatScheduleEventTime(event.startTime)}–${formatScheduleEventTime(event.endTime)}`;
 
   return (
     <Card
@@ -70,7 +36,7 @@ export const ScheduleEventCard = ({
       <Flex direction="column" gap={compact ? 4 : 6}>
         <Flex align="flex-start" justify="space-between" gap={6}>
           <Text typography="label-5-regular" style="dense">
-            {time}
+            {formatScheduleEventTimeRange(event.startTime, event.endTime)}
           </Text>
 
           <Text typography="label-5-regular" style={trackConfig.textStyle}>

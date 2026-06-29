@@ -1,9 +1,30 @@
 import path from "node:path";
-import { defineConfig, type Plugin, type ViteDevServer, type Connect } from "vite";
+import { defineConfig, type Connect, type Plugin, type ViteDevServer } from "vite";
 import type { ServerResponse } from "node:http";
 import react from "@vitejs/plugin-react";
 
-const allJuneData = [
+type LectureTrack = "FRONTEND" | "BACKEND" | "ANALYTICS";
+
+type MockScheduleEvent = {
+  type: "LECTURE";
+  id: number;
+  title: string;
+  start_time: string;
+  end_time: string;
+  teacher: {
+    id: number;
+    first_name: string;
+    last_name: string;
+  };
+  tracks: LectureTrack[];
+};
+
+type MockScheduleDay = {
+  date: string;
+  events: MockScheduleEvent[];
+};
+
+const allJuneData: MockScheduleDay[] = [
   {
     date: "2026-06-01",
     events: [
@@ -70,6 +91,15 @@ const allJuneData = [
         end_time: "2026-06-04T15:30:00Z",
         teacher: { id: 104, first_name: "Дарья", last_name: "Попова" },
         tracks: ["BACKEND"],
+      },
+      {
+        type: "LECTURE",
+        id: 28,
+        title: "Проверка отображения занятия на границе дня",
+        start_time: "2026-06-04T23:30:00Z",
+        end_time: "2026-06-05T01:00:00Z",
+        teacher: { id: 101, first_name: "Алексей", last_name: "Иванов" },
+        tracks: ["FRONTEND", "BACKEND"],
       },
     ],
   },
@@ -324,31 +354,75 @@ const allJuneData = [
   },
 ];
 
+const isScheduleUrl = (url: string) => {
+  return url.includes("/api/schedules") || url.includes("/api/schedule");
+};
+
+const getDateFromIso = (date: string) => {
+  return date.slice(0, 10);
+};
+
+const groupEventsByApiDate = (events: MockScheduleEvent[]): MockScheduleDay[] => {
+  const eventsByDate = events.reduce<Record<string, MockScheduleEvent[]>>(
+    (acc, event) => {
+      const dateKey = getDateFromIso(event.start_time);
+
+      acc[dateKey] ??= [];
+      acc[dateKey].push(event);
+
+      return acc;
+    },
+    {},
+  );
+
+  return Object.entries(eventsByDate)
+    .map(([date, groupedEvents]) => ({
+      date,
+      events: groupedEvents,
+    }))
+    .sort((firstDay, secondDay) => firstDay.date.localeCompare(secondDay.date));
+};
+
 const mockBackendPlugin = (): Plugin => ({
   name: "mock-backend",
   configureServer(server: ViteDevServer) {
     server.middlewares.use(
       (req: Connect.IncomingMessage, res: ServerResponse, next: Connect.NextFunction) => {
-        if (req.url && req.url.includes("/api/schedule")) {
-          const url = new URL(req.url, `http://${req.headers.host}`);
-
-          const startDate = url.searchParams.get("start_date");
-          const endDate = url.searchParams.get("end_date");
-
-          let responseData = allJuneData;
-
-          if (startDate && endDate) {
-            responseData = allJuneData.filter(
-              (day) => day.date >= startDate && day.date <= endDate,
-            );
-          }
-
-          res.setHeader("Content-Type", "application/json");
-          res.end(JSON.stringify(responseData));
+        if (!req.url || !isScheduleUrl(req.url)) {
+          next();
           return;
         }
 
-        next();
+        const url = new URL(req.url, `http://${req.headers.host}`);
+
+        const startDate = url.searchParams.get("start_date");
+        const endDate = url.searchParams.get("end_date");
+        const track = url.searchParams.get("track") as LectureTrack | null;
+
+        const filteredEvents = allJuneData
+          .flatMap((day) => day.events)
+          .filter((event) => {
+            const eventDate = getDateFromIso(event.start_time);
+
+            if (startDate && eventDate < startDate) {
+              return false;
+            }
+
+            if (endDate && eventDate > endDate) {
+              return false;
+            }
+
+            if (track && !event.tracks.includes(track)) {
+              return false;
+            }
+
+            return true;
+          });
+
+        const responseData = groupEventsByApiDate(filteredEvents);
+
+        res.setHeader("Content-Type", "application/json");
+        res.end(JSON.stringify(responseData));
       },
     );
   },

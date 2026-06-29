@@ -7,7 +7,6 @@ export interface TeacherInfoResponse {
 }
 
 export type ScheduleEventResponse = {
-  type: "LECTURE";
   id: number;
   title: string;
   start_time: string;

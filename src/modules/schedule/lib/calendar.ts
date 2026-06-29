@@ -1,3 +1,9 @@
+import {
+  DAYS_IN_WEEK,
+  MONDAY_DAY_INDEX,
+  SCHEDULE_RANGE_PADDING_DAYS,
+  SUNDAY_DAY_INDEX,
+} from "@/modules/schedule/constants/scheduleCalendar";
 import { getScheduleDateKey } from "@/modules/schedule/lib/formatScheduleDate";
 
 export type CalendarView = "month" | "week";
@@ -6,10 +12,6 @@ interface CalendarRange {
   startDate: string;
   endDate: string;
 }
-
-const MONDAY_DAY_INDEX = 1;
-const SUNDAY_DAY_INDEX = 7;
-const DAYS_IN_WEEK = 7;
 
 const getWeekdayIndex = (date: Date): number => {
   const weekdayIndex = date.getDay();
@@ -32,24 +34,6 @@ const getWeekStart = (date: Date): Date => {
   weekStart.setDate(date.getDate() - weekdayIndex + MONDAY_DAY_INDEX);
 
   return weekStart;
-};
-const getWeekEnd = (date: Date): Date => {
-  const weekStart = getWeekStart(date);
-  const weekEnd = new Date(weekStart);
-
-  weekEnd.setDate(weekStart.getDate() + DAYS_IN_WEEK - 1);
-
-  return weekEnd;
-};
-
-export const getScheduleRange = (date: Date, view: CalendarView): CalendarRange => {
-  const startDate = view === "month" ? getMonthStart(date) : getWeekStart(date);
-  const endDate = view === "month" ? getMonthEnd(date) : getWeekEnd(date);
-
-  return {
-    startDate: getScheduleDateKey(startDate),
-    endDate: getScheduleDateKey(endDate),
-  };
 };
 
 const getMonthCalendarDays = (date: Date): Date[] => {
@@ -74,6 +58,13 @@ const getMonthCalendarDays = (date: Date): Date[] => {
   }
 
   return days;
+};
+
+const addDays = (date: Date, daysCount: number): Date => {
+  const nextDate = new Date(date);
+  nextDate.setDate(date.getDate() + daysCount);
+
+  return nextDate;
 };
 
 const getWeekCalendarDays = (date: Date): Date[] => {
@@ -101,6 +92,15 @@ export const getNextPeriodDate = (date: Date, view: CalendarView): Date => {
   nextWeekDate.setDate(date.getDate() + DAYS_IN_WEEK);
 
   return nextWeekDate;
+};
+export const getScheduleRange = (date: Date, view: CalendarView): CalendarRange => {
+  const days = getCalendarDays(date, view);
+  const startDate = days[0];
+  const endDate = days[days.length - 1];
+  return {
+    startDate: getScheduleDateKey(addDays(startDate, -SCHEDULE_RANGE_PADDING_DAYS)),
+    endDate: getScheduleDateKey(addDays(endDate, SCHEDULE_RANGE_PADDING_DAYS)),
+  };
 };
 
 export const getPreviousPeriodDate = (date: Date, view: CalendarView): Date => {

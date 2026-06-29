@@ -27,7 +27,6 @@ export const MonthDayCell = ({
   onMoreEventsClick,
 }: MonthDayCellProps) => {
   const dateKey = getScheduleDateKey(day);
-
   const isOutsideMonth = !isSameMonth(day, calendarDate);
   const isCurrentDay = isToday(day);
 
