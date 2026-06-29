@@ -6,17 +6,18 @@ export const scheduleTexts = {
   toolbar: {
     today: "Сегодня",
     createLecture: "Создать лекцию",
-    previousPeriod: "Предыдущий период",
-    nextPeriod: "Следующий период",
-    selectDate: "Выбрать дату",
+  },
+
+  tracks: {
+    frontend: "Frontend",
+    backend: "Backend",
+    analytics: "Analytics",
+    common: "Общая",
   },
 
   trackFilter: {
     label: "Направление",
     all: "Все направления",
-    frontend: "Frontend",
-    backend: "Backend",
-    analytics: "Analytics",
   },
 
   calendar: {
