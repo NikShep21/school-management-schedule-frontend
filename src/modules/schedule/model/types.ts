@@ -2,8 +2,9 @@ import type { LectureTrack, LectureTeacher } from "@/entities/lecture";
 
 export type ScheduleMode = "readonly" | "editable";
 
+export type TrackFilterValue = LectureTrack | "ALL";
+
 export type ScheduleEvent = {
-  type: "LECTURE";
   id: number;
   title: string;
   startTime: string;

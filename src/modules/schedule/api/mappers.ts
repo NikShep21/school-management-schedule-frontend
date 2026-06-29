@@ -6,7 +6,6 @@ import type { ScheduleDay, ScheduleEvent } from "@/modules/schedule/model/types"
 
 const mapScheduleEventResponse = (event: ScheduleEventResponse): ScheduleEvent => {
   return {
-    type: event.type,
     id: event.id,
     title: event.title,
     startTime: event.start_time,
