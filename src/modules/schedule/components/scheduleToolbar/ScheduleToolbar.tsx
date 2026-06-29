@@ -1,30 +1,37 @@
-import { Button, Flex, Loader, Text } from "@hh.ru/magritte-ui";
+import { Button, Flex, Loader } from "@hh.ru/magritte-ui";
 import {
   ChevronLeftOutlinedSize24,
   ChevronRightOutlinedSize24,
 } from "@hh.ru/magritte-ui/icon";
 
 import { scheduleTexts } from "@/modules/schedule/constants/scheduleTexts";
-
+import { SchedulePeriodPicker } from "@/modules/schedule/components/schedulePeriodPicker/SchedulePeriodPicker";
+import { ScheduleTrackFilter } from "@/modules/schedule/components/scheduleTrackFilter/ScheduleTrackFilter";
 import {
   getNextPeriodDate,
   getPreviousPeriodDate,
   type CalendarView,
 } from "@/modules/schedule/lib/calendar";
-import { formatSchedulePeriodTitle } from "@/modules/schedule/lib/formatScheduleDate";
+import type { TrackFilterValue } from "@/modules/schedule/model/types";
 
 type ScheduleToolbarProps = {
   calendarDate: Date;
   view: CalendarView;
+  isMobile: boolean;
   isFetching: boolean;
+  trackFilter: TrackFilterValue;
   onDateChange: (date: Date) => void;
+  onTrackFilterChange: (value: TrackFilterValue) => void;
 };
 
 export const ScheduleToolbar = ({
   calendarDate,
   view,
+  isMobile,
   isFetching,
+  trackFilter,
   onDateChange,
+  onTrackFilterChange,
 }: ScheduleToolbarProps) => {
   const handlePreviousClick = () => {
     onDateChange(getPreviousPeriodDate(calendarDate, view));
@@ -39,33 +46,53 @@ export const ScheduleToolbar = ({
   };
 
   return (
-    <Flex align="center" justify="space-between" gap={16} mb={24}>
-      <Flex align="center" gap={12}>
-        <Button
-          type="button"
-          mode="secondary"
-          style="accent"
-          size="small"
-          onClick={handleTodayClick}
-        >
-          {scheduleTexts.toolbar.today}
-        </Button>
+    <Flex
+      direction={{ xs: "column", s: "row" }}
+      align={{ xs: "stretch", s: "center" }}
+      justify="space-between"
+      gap={16}
+      mb={24}
+    >
+      <Flex align="center" gap={12} wrap="wrap">
+        <Flex align="center" gap={8}>
+          <Button
+            type="button"
+            mode="secondary"
+            style="accent"
+            size="small"
+            onClick={handleTodayClick}
+          >
+            {scheduleTexts.toolbar.today}
+          </Button>
 
-        <ChevronLeftOutlinedSize24
-          aria-label={scheduleTexts.toolbar.previousPeriod}
-          initialColor="primary"
-          highlightedColor="accent"
-          onClick={handlePreviousClick}
+          <ChevronLeftOutlinedSize24
+            initialColor="primary"
+            highlightedColor="accent"
+            onClick={handlePreviousClick}
+          />
+
+          <ChevronRightOutlinedSize24
+            initialColor="primary"
+            highlightedColor="accent"
+            onClick={handleNextClick}
+          />
+        </Flex>
+
+        <SchedulePeriodPicker
+          value={calendarDate}
+          isMobile={isMobile}
+          onChange={onDateChange}
         />
 
-        <ChevronRightOutlinedSize24
-          aria-label={scheduleTexts.toolbar.nextPeriod}
-          initialColor="primary"
-          highlightedColor="accent"
-          onClick={handleNextClick}
-        />
-        <Text>{formatSchedulePeriodTitle(calendarDate)}</Text>
         {isFetching && <Loader size={24} />}
+      </Flex>
+
+      <Flex
+        direction={{ xs: "column", s: "row" }}
+        align={{ xs: "stretch", s: "center" }}
+        gap={20}
+      >
+        <ScheduleTrackFilter value={trackFilter} onChange={onTrackFilterChange} />
       </Flex>
     </Flex>
   );
