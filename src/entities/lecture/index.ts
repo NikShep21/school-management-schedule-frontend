@@ -6,3 +6,8 @@ export type {
   LectureStream,
   LectureTeacher,
 } from "./model/types";
+
+export {
+  useUpdateLectureMutation,
+  updateLectureRequest,
+} from "./api/requests/updateLecture";

@@ -19,6 +19,7 @@ export interface LectureMaterial {
   title: string;
   url: string;
 }
+export type LectureMaterialDraft = Omit<LectureMaterial, "id">;
 
 export interface Lecture {
   id: number;

@@ -1,4 +1,4 @@
-import { Button, Flex, Loader } from "@hh.ru/magritte-ui";
+import { Box, Button, Flex, Loader } from "@hh.ru/magritte-ui";
 import {
   ChevronLeftOutlinedSize24,
   ChevronRightOutlinedSize24,
@@ -18,20 +18,24 @@ type ScheduleToolbarProps = {
   calendarDate: Date;
   view: CalendarView;
   isMobile: boolean;
+  isEditable: boolean;
   isFetching: boolean;
   trackFilter: TrackFilterValue;
   onDateChange: (date: Date) => void;
   onTrackFilterChange: (value: TrackFilterValue) => void;
+  onCreateLectureClick: () => void;
 };
 
 export const ScheduleToolbar = ({
   calendarDate,
   view,
   isMobile,
+  isEditable,
   isFetching,
   trackFilter,
   onDateChange,
   onTrackFilterChange,
+  onCreateLectureClick,
 }: ScheduleToolbarProps) => {
   const handlePreviousClick = () => {
     onDateChange(getPreviousPeriodDate(calendarDate, view));
@@ -93,6 +97,20 @@ export const ScheduleToolbar = ({
         gap={20}
       >
         <ScheduleTrackFilter value={trackFilter} onChange={onTrackFilterChange} />
+
+        {isEditable && (
+          <Box>
+            <Button
+              type="button"
+              mode="primary"
+              style="accent"
+              stretched
+              onClick={onCreateLectureClick}
+            >
+              {scheduleTexts.toolbar.createLecture}
+            </Button>
+          </Box>
+        )}
       </Flex>
     </Flex>
   );
