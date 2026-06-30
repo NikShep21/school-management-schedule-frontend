@@ -4,17 +4,28 @@ import { Box, Flex, Loader, useBreakpoint } from "@hh.ru/magritte-ui";
 import { useScheduleQuery } from "@/modules/schedule/api/requests/getSchedule";
 import { DayEventsModal } from "@/modules/schedule/components/dayEventsModal/DayEventsModal";
 import { ScheduleCalendar } from "@/modules/schedule/components/scheduleCalendar/ScheduleCalendar";
+import { ScheduleDndCalendar } from "@/modules/schedule/components/scheduleDndCalendar/ScheduleDndCalendar";
 import { ScheduleToolbar } from "@/modules/schedule/components/scheduleToolbar/ScheduleToolbar";
-
 import {
   getCalendarDays,
   getScheduleRange,
   type CalendarView,
 } from "@/modules/schedule/lib/calendar";
 import { getEventsByDate } from "@/modules/schedule/lib/getEventsByDate";
-import type { ScheduleEvent, TrackFilterValue } from "@/modules/schedule/model/types";
+import type {
+  ScheduleEvent,
+  ScheduleMode,
+  TrackFilterValue,
+} from "@/modules/schedule/model/types";
 
-export const Schedule = () => {
+import { useMoveLectureMutation } from "@/modules/schedule/api/requests/moveLecture";
+import { getScheduleDateKey } from "@/modules/schedule/lib/formatScheduleDate";
+
+interface ScheduleProps {
+  mode: ScheduleMode;
+}
+
+export const Schedule = ({ mode }: ScheduleProps) => {
   const { isMobile } = useBreakpoint();
 
   const [calendarDate, setCalendarDate] = useState(() => new Date());
@@ -23,6 +34,8 @@ export const Schedule = () => {
   const [isDayEventsModalVisible, setIsDayEventsModalVisible] = useState(false);
 
   const view: CalendarView = isMobile ? "week" : "month";
+  const isEditable = mode === "editable";
+  const isDndEnabled = isEditable && view === "month";
 
   const scheduleParams = {
     ...getScheduleRange(calendarDate, view),
@@ -35,6 +48,7 @@ export const Schedule = () => {
     isFetching,
   } = useScheduleQuery(scheduleParams);
 
+  const { mutate: moveLectureInSchedule } = useMoveLectureMutation();
   const days = getCalendarDays(calendarDate, view);
 
   const eventsByDate = useMemo(() => {
@@ -58,31 +72,62 @@ export const Schedule = () => {
     void event;
   };
 
+  const handleCreateLectureClick = () => {};
+
+  const handleCreateEventClick = (date: string) => {
+    void date;
+  };
+
+  const handleEventDrop = ({
+    event,
+    targetDateKey,
+  }: {
+    event: ScheduleEvent;
+    targetDateKey: string;
+  }) => {
+    const currentDateKey = getScheduleDateKey(new Date(event.startTime));
+    if (currentDateKey === targetDateKey) return;
+
+    moveLectureInSchedule({
+      event,
+      targetDateKey,
+      scheduleParams,
+    });
+  };
+
+  const calendarProps = {
+    days,
+    calendarDate,
+    view,
+    isEditable,
+    eventsByDate,
+    onEventClick: handleEventClick,
+    onCreateEventClick: isEditable ? handleCreateEventClick : undefined,
+    onMoreEventsClick: handleMoreEventsClick,
+  };
+
   return (
     <Box Element="section">
       <ScheduleToolbar
         calendarDate={calendarDate}
         view={view}
         isMobile={isMobile}
+        isEditable={isEditable}
         isFetching={isFetching && !isPending}
         trackFilter={trackFilter}
         onDateChange={setCalendarDate}
         onTrackFilterChange={setTrackFilter}
+        onCreateLectureClick={handleCreateLectureClick}
       />
 
       {isPending ? (
         <Flex pt="18vh" align="center" justify="center">
           <Loader size={48} />
         </Flex>
+      ) : isDndEnabled ? (
+        <ScheduleDndCalendar {...calendarProps} onEventDrop={handleEventDrop} />
       ) : (
-        <ScheduleCalendar
-          days={days}
-          calendarDate={calendarDate}
-          view={view}
-          eventsByDate={eventsByDate}
-          onEventClick={handleEventClick}
-          onMoreEventsClick={handleMoreEventsClick}
-        />
+        <ScheduleCalendar {...calendarProps} />
       )}
 
       {selectedEventsDate && (
