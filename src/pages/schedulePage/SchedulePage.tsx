@@ -5,7 +5,7 @@ export const SchedulePage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.pageContainer}>
-        <Schedule />
+        <Schedule mode="editable" />
       </div>
     </main>
   );
