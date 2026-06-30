@@ -7,8 +7,10 @@ export type ScheduleCalendarProps = {
   days: Date[];
   calendarDate: Date;
   view: CalendarView;
+  isEditable: boolean;
   eventsByDate: Record<string, ScheduleEvent[]>;
   onEventClick: (event: ScheduleEvent) => void;
+  onCreateEventClick?: (date: string) => void;
   onMoreEventsClick?: (date: string) => void;
 };
 

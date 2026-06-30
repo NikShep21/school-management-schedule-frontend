@@ -1,4 +1,5 @@
 import { Box, Flex, Text } from "@hh.ru/magritte-ui";
+import { PlusOutlinedSize24 } from "@hh.ru/magritte-ui/icon";
 import classNames from "classnames";
 
 import { ScheduleEventCard } from "@/modules/schedule/components/scheduleEventCard/ScheduleEventCard";
@@ -17,7 +18,13 @@ type WeekCalendarProps = Omit<
   "view" | "calendarDate" | "onMoreEventsClick"
 >;
 
-export const WeekCalendar = ({ days, eventsByDate, onEventClick }: WeekCalendarProps) => {
+export const WeekCalendar = ({
+  days,
+  isEditable,
+  eventsByDate,
+  onEventClick,
+  onCreateEventClick,
+}: WeekCalendarProps) => {
   return (
     <Flex direction="column" gap={12}>
       {days.map((day) => {
@@ -33,7 +40,7 @@ export const WeekCalendar = ({ days, eventsByDate, onEventClick }: WeekCalendarP
             className={classNames(styles.weekDay, isCurrentDay && styles.weekDayToday)}
           >
             <Flex direction="column" gap={8}>
-              <Flex align="center" justify="space-between">
+              <Flex align="center" justify={"space-between"}>
                 <Flex align="center" gap={6}>
                   <Text
                     typography="label-2-regular"
@@ -44,6 +51,14 @@ export const WeekCalendar = ({ days, eventsByDate, onEventClick }: WeekCalendarP
                   </Text>
                   <Text typography="title-5-semibold">{day.getDate()}</Text>
                 </Flex>
+
+                {isEditable && (
+                  <PlusOutlinedSize24
+                    initialColor="secondary"
+                    highlightedColor="accent"
+                    onClick={() => onCreateEventClick?.(dateKey)}
+                  />
+                )}
               </Flex>
 
               {events.length > 0 ? (

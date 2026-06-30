@@ -12,8 +12,10 @@ type MonthCalendarProps = Omit<ScheduleCalendarProps, "view">;
 export const MonthCalendar = ({
   days,
   calendarDate,
+  isEditable,
   eventsByDate,
   onEventClick,
+  onCreateEventClick,
   onMoreEventsClick,
 }: MonthCalendarProps) => {
   return (
@@ -40,8 +42,10 @@ export const MonthCalendar = ({
             key={dateKey}
             day={day}
             calendarDate={calendarDate}
+            isEditable={isEditable}
             events={eventsByDate[dateKey] ?? []}
             onEventClick={onEventClick}
+            onCreateEventClick={onCreateEventClick}
             onMoreEventsClick={onMoreEventsClick}
           />
         );
